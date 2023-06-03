@@ -11,7 +11,9 @@ using Random = UnityEngine.Random;
 public class NodeObject : MonoBehaviour
 {
     [NonSerialized] public Node from = null;
-    [NonSerialized] public Node target = null; 
+    [NonSerialized] public Node target = null;
+    [SerializeField] private ColorPallete colorPallete;
+    [SerializeField] private TextMeshProUGUI powerText;
     public bool combine = false;
     private int m_value;
     public int value
@@ -30,59 +32,15 @@ public class NodeObject : MonoBehaviour
 
     private void SetColor(int value)
     {
-        Color color = new Color(1f, 0.42f, 0.42f);
-        
-        
-        switch (value)
-        {
-            case 2:
-                color = new Color(0.14f, 0.62f, 1f); 
-                break;
-            case 4:
-                color = new Color(0.14f, 0.62f, 1f);
-               
-                break;
-            case 8:
-                color = new Color(1f, 0.45f, 0f);
-                break;
-            case 16:
-                color = new Color(1f, 0.45f, 0f);
-                break;
-            case 32: 
-                color = new Color(1f, 0.42f, 0.42f);
-                break;
-            case 64: 
-                color = new Color(1f, 0.42f, 0.42f);
-                break;
-            case 128:
-                color = new Color(1f,0.35f, 0.35f);
-                break;
-            case 256:
-                color = new Color(1f,0.35f, 0.35f);
-                break;
-            case 512:
-                color = new Color(1f, 0.15f, 0.15f);
-                break;
-            case 1024:
-                color = new Color(1f, 0.15f, 0.15f);
-                break;
-            case 2048:
-                color = new Color(1f, 0, 0);
-                break;
-            case 4096:
-                color = new Color(1f, 0, 0);
-                break;
-                color = Color.black;
-                break;
-        }
-
-        blockImage.color = color;
+        blockImage.color = colorPallete.nodeColors[(int)Mathf.Log(value, 2) - 1];
+        powerText.color = colorPallete.nodePowerColor[(int)Mathf.Log(value, 2) - 1];
     }
+
     public void InitializeFirstValue()
     {
-        int[] v = new int[] {2, 4}; 
+        int[] v = new int[] { 2, 4 };
         this.value = v[Random.Range(0, v.Length)];
-    }  
+    }
     public void MoveToNode(Node from, Node to)
     {
         combine = false;
@@ -94,7 +52,7 @@ public class NodeObject : MonoBehaviour
     {
         combine = true;
         this.from = from;
-        this.target = to; 
+        this.target = to;
     }
     public void OnEndMove()
     {
@@ -108,31 +66,31 @@ public class NodeObject : MonoBehaviour
                 t.onComplete += () =>
                 {
                     this.needDestroy = true;
-                    this.target = null; 
-                    this.from = null; 
-                }; 
+                    this.target = null;
+                    this.from = null;
+                };
             }
             else
-            {  
+            {
                 this.from = null;
                 this.target = null;
             }
-        } 
-    } 
-    public bool needDestroy= false;
+        }
+    }
+    public bool needDestroy = false;
 
     public void StartMoveAnimation()
     {
         if (target != null)
         {
-            this.name = target.point.ToString(); 
+            this.name = target.point.ToString();
             var tween = this.blockImage.rectTransform.DOLocalMove(target.position, 0.1f);
             tween.onComplete += () =>
             {
-                OnEndMove();  
+                OnEndMove();
             };
         }
-        
+
     }
     public void UpdateMoveAnimation()
     {
@@ -143,7 +101,7 @@ public class NodeObject : MonoBehaviour
             this.transform.localPosition = p;
             if (Vector2.Distance(this.transform.localPosition, target.position) < 0.25f)
             {
-                OnEndMove();  
+                OnEndMove();
             }
         }
     }
